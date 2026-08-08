@@ -1,0 +1,20 @@
+{
+  "name": "mytax-service",
+  "version": "1.0.0",
+  "description": "Сервис чеков «Мой налог» для самозанятых и ИП на НПД — создание чеков через официальное API ФНС lknpd.nalog.ru",
+  "license": "MIT",
+  "author": "asidlink",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "body-parser": "^2.2.2",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "lknpd-nalog-api": "^1.0.1",
+    "nodemailer": "^7.0.13"
+  }
+}
