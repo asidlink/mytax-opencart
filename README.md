@@ -4,7 +4,7 @@
 
 > Автоматическое создание чеков в «Мой Налог» (через API). Отправка письма покупателю с QR-кодом кассового чека после оплаты.
 
-> 📦 **Первоисточник:** [loolzaaa/mytax-client](https://github.com/loolzaaa/mytax-client) — PHP-клиент для работы с API «Мой налог», на базе которого создан модуль.
+> 📦 **Первоисточник:** [loolzaaa/mytax-client](https://github.com/loolzaaa/mytax-client) — клиент API «Мой налог» (Java, лицензия MIT, © 2025 Andrey Korsakov).
 
 ---
 
@@ -32,7 +32,7 @@
 
 **«Мой налог»** — модуль OpenCart 4. Автоматическое создание чеков в «Мой Налог» (через API). Отправка письма покупателю с QR-кодом кассового чека после оплаты.
 
-Первоисточник проекта — PHP-клиент API «Мой налог»: **[loolzaaa/mytax-client](https://github.com/loolzaaa/mytax-client)**.
+Первоисточник проекта — клиент API «Мой налог»: **[loolzaaa/mytax-client](https://github.com/loolzaaa/mytax-client)** (Java, лицензия MIT, © 2025 Andrey Korsakov).
 
 Модуль:
 
@@ -377,6 +377,8 @@ php install_mytax_debian.php
 ## 📄 Лицензия
 
 Проект распространяется под **свободной лицензией [GPL-3.0](LICENSE)** — свободное программное обеспечение (GNU General Public License v3), совместимо с OpenCart.
+
+Первоисточник проекта — [loolzaaa/mytax-client](https://github.com/loolzaaa/mytax-client) © 2025 Andrey Korsakov, лицензия **MIT** (его использование/доработка разрешены условиями MIT License).
 
 Встроенная библиотека **phpqrcode** — © Dominik Dzienia (PHP QR Code), лицензия **LGPL-3**.
 
