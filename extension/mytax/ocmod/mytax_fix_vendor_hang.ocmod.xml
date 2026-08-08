@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>MyTax: Fix vendor update hang</name>
+    <code>mytax_fix_vendor_hang</code>
+    <version>4.0.7</version>
+    <author>MyTax-Service</author>
+    <link></link>
+    <file path="system/helper/vendor.php">
+        <operation>
+            <search><![CDATA[function oc_generate_vendor(): void {
+	$code = '<?php' . "\n";]]></search>
+            <add position="replace"><![CDATA[function oc_generate_vendor(): void {
+	set_time_limit(600);
+	ini_set('memory_limit', '512M');
+
+	// Быстрый выход: если vendor.php уже сгенерирован и composer.json не менялись.
+	$vendor_file = DIR_SYSTEM . 'vendor.php';
+	$composer_files = glob(DIR_STORAGE . 'vendor/*/*/composer.json');
+	$newest = 0;
+	foreach ($composer_files as $cf) {
+		$t = @filemtime($cf);
+		if ($t !== false && $t > $newest) $newest = $t;
+	}
+	if (is_file($vendor_file)) {
+		$vt = @filemtime($vendor_file);
+		if ($vt !== false && $vt >= $newest) {
+			return;
+		}
+	}
+
+	$code = '<?php' . "\n";]]></add>
+        </operation>
+    </file>
+</modification>
