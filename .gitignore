@@ -21,7 +21,7 @@ capture.js
 to_nalog
 
 # Сборочные артефакты в корне (актуальные релизы лежат в releases/)
-mytax.ocmod.zip
+/mytax.ocmod.zip
 
 # Системные файлы
 .DS_Store
