@@ -8,7 +8,7 @@ if ($zip->open('G:/DOWNLOAD/mytax_fixed.zip', ZipArchive::CREATE) !== true) die(
 // install.json - с type=module (как у ChatGPT)
 $zip->addFromString('install.json', json_encode([
     'code' => 'mytax',
-    'name' => 'Мой налог: кассовые чеки для ИП (НПД)',
+    'name' => 'Мой налог',
     'version' => '2.3.0',
     'author' => 'MyTax-Service',
     'link' => '',

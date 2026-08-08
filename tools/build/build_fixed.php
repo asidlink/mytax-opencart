@@ -17,7 +17,7 @@ if ($zip->open('G:/DOWNLOAD/mytax_fixed.ocmod.zip', ZipArchive::CREATE) !== true
 // install.json - КЛЮЧЕВОЙ МОМЕНТ: type=module + code=mytax
 $zip->addFromString('install.json', json_encode([
     'code' => 'mytax',
-    'name' => 'Мой налог: кассовые чеки для ИП (НПД)',
+    'name' => 'Мой налог',
     'version' => '2.3.0',
     'author' => 'MyTax-Service',
     'link' => '',

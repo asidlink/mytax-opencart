@@ -15,7 +15,7 @@ if ($zip->open($targetZip, ZipArchive::CREATE) !== true) {
 // ===== 1. install.json (без install.php - стандартная установка OC) =====
 $zip->addFromString('install.json', json_encode([
     'code' => 'mytax',
-    'name' => 'Мой налог: кассовые чеки для ИП (НПД)',
+    'name' => 'Мой налог',
     'description' => 'Автоматическое создание чеков в приложении Мой налог (НПД)',
     'version' => '2.0.1',
     'author' => 'MyTax-Service',

@@ -40,7 +40,7 @@ $g = new ZipArchive(); $g->open('G:/DOWNLOAD/mytax.ocmod.zip');
 $zip = new ZipArchive(); $zip->open($target, ZipArchive::CREATE);
 
 $zip->addFromString('install.json', json_encode([
-    'code'=>'mytax','name'=>'Мой налог: кассовые чеки для ИП (НПД)','version'=>'3.2.0',
+    'code'=>'mytax','name'=>'Мой налог','version'=>'3.2.0',
     'author'=>'MyTax-Service','link'=>'','type'=>'module'
 ], JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT));
 $zip->addFromString('README.txt', $g->getFromName('README.txt'));
@@ -253,7 +253,7 @@ echo "  OK\n";
 // ========== 5. ЗАПИСЬ НАСТРОЕК ==========
 echo "=== 5. Настройки модуля ===\n";
 $m->query("INSERT INTO oc_extension SET `extension`='mytax', type='module', code='mytax'");
-$m->query("INSERT INTO oc_module SET name='Мой налог: кассовые чеки для ИП (НПД)', code='mytax', setting=''");
+$m->query("INSERT INTO oc_module SET name='Мой налог', code='mytax', setting=''");
 $m->query("INSERT INTO oc_setting SET `code`='module_mytax', `key`='module_mytax_status', `value`='1'");
 $m->query("INSERT INTO oc_setting SET `code`='module_mytax', `key`='module_mytax_inn', `value`='$INN'");
 $m->query("INSERT INTO oc_setting SET `code`='module_mytax', `key`='module_mytax_password', `value`='" . $m->real_escape_string($PASSWORD) . "'");

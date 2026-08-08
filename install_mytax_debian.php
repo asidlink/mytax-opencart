@@ -239,7 +239,7 @@ $existing = $mysqli->query("SELECT * FROM `{$DB_PREFIX}extension_install` WHERE 
 if (!$existing || !$existing->num_rows) {
     $mysqli->query("INSERT INTO `{$DB_PREFIX}extension_install`
         (`extension_download_id`, `name`, `description`, `code`, `version`, `author`, `link`, `status`, `date_added`)
-        VALUES (0, 'Мой налог: кассовые чеки для ИП (НПД)', '', 'mytax', '4.0.8', 'MyTax-Service', '', 1, NOW())");
+        VALUES (0, 'Мой налог', '', 'mytax', '4.0.8', 'MyTax-Service', '', 1, NOW())");
     $installId = $mysqli->insert_id;
     echo "[OK] oc_extension_install id=$installId\n";
 } else {

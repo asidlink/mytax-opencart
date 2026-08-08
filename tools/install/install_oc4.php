@@ -37,7 +37,7 @@ $m->query("INSERT INTO {$p}extension SET `extension`='mytax', `type`='module', `
 $extId = $m->insert_id;
 echo "oc_extension id=$extId extension=mytax\n";
 
-$m->query("INSERT INTO {$p}extension_install SET extension_id=$extId, extension_download_id=0, code='mytax', name='Мой налог: кассовые чеки для ИП (НПД)', version='2.0.1', author='MyTax-Service', status=1, date_added=NOW()");
+$m->query("INSERT INTO {$p}extension_install SET extension_id=$extId, extension_download_id=0, code='mytax', name='Мой налог', version='2.0.1', author='MyTax-Service', status=1, date_added=NOW()");
 $instId = $m->insert_id;
 
 $paths = [
@@ -51,7 +51,7 @@ $paths = [
 ];
 foreach ($paths as $p2) $m->query("INSERT INTO {$p}extension_path SET extension_install_id=$instId, path='$p2'");
 
-$m->query("INSERT INTO {$p}module SET name='Мой налог: кассовые чеки для ИП (НПД)', code='mytax', setting=''");
+$m->query("INSERT INTO {$p}module SET name='Мой налог', code='mytax', setting=''");
 echo "oc_module id=" . $m->insert_id . "\n";
 
 $m->query("INSERT INTO {$p}event SET code='mytax_order_history', `trigger`='catalog/model/checkout/order.addHistory/before', action='extension/mytax/module/mytax.orderHistory', status=1, sort_order=1");

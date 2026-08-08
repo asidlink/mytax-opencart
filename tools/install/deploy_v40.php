@@ -22,7 +22,7 @@ echo "=== 1. Создание файлов модуля v4.0.1 ===\n";
 // --- install.json ---
 $files['install.json'] = json_encode([
     'code' => 'mytax',
-    'name' => 'Мой налог: кассовые чеки для ИП (НПД)',
+    'name' => 'Мой налог',
     'version' => '4.0.1',
     'author' => 'MyTax-Service',
     'link' => '',
@@ -172,7 +172,7 @@ PHP;
 // --- admin/language/ru-ru/module/mytax.php ---
 $files['admin/language/ru-ru/module/mytax.php'] = <<<'PHP'
 <?php
-$_['heading_title'] = 'Мой налог: кассовые чеки для ИП (НПД)';
+$_['heading_title'] = 'Мой налог';
 $_['text_edit'] = 'Редактирование модуля';
 $_['text_enabled'] = 'Включено';
 $_['text_disabled'] = 'Отключено';
@@ -528,7 +528,7 @@ PHP;
 $files['catalog/language/ru-ru/module/mytax.php'] = '<?php' . PHP_EOL;
 
 // --- README ---
-$files['README.txt'] = "Мой налог: кассовые чеки для ИП (НПД) v4.0.1\nЧистый PHP без Node.js\n";
+$files['README.txt'] = "Мой налог v4.0.1\nЧистый PHP без Node.js\n";
 
 // Запись файлов
 foreach ($files as $rel => $content) {
@@ -593,7 +593,7 @@ $m->query("CREATE TABLE IF NOT EXISTS oc_mytax_receipts (
 
 // Регистрация расширения, модуля, настроек
 $m->query("INSERT INTO oc_extension SET `extension`='mytax', type='module', code='mytax'");
-$m->query("INSERT INTO oc_module SET name='Мой налог: кассовые чеки для ИП (НПД)', code='mytax', setting=''");
+$m->query("INSERT INTO oc_module SET name='Мой налог', code='mytax', setting=''");
 $m->query("INSERT INTO oc_setting SET `code`='module_mytax', `key`='module_mytax_status', `value`='1'");
 $m->query("INSERT INTO oc_setting SET `code`='module_mytax', `key`='module_mytax_inn', `value`='$INN'");
 $m->query("INSERT INTO oc_setting SET `code`='module_mytax', `key`='module_mytax_password', `value`='" . $m->real_escape_string($PASS) . "'");

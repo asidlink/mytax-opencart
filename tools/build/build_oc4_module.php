@@ -13,7 +13,7 @@ $tM = 'C:/Users/admin/AppData/Local/Temp/mytax_zip_build';
 // install.json - минимальный, как у yoomoney
 $zip->addFromString('install.json', json_encode([
     'code' => 'mytax',
-    'name' => 'Мой налог: кассовые чеки для ИП (НПД)',
+    'name' => 'Мой налог',
     'version' => '2.0.1',
     'author' => 'MyTax-Service',
     'link' => 'https://github.com/Ga1maz/fns-receipt-service'

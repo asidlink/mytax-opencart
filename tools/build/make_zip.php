@@ -12,7 +12,7 @@ if ($zip->open('C:/sites/metalka/mytax.ocmod.zip', ZipArchive::CREATE) !== true)
 // install.json - OC4 читает code
 $zip->addFromString('install.json', json_encode([
     'code' => 'mytax',
-    'name' => 'Мой налог: кассовые чеки для ИП (НПД)',
+    'name' => 'Мой налог',
     'version' => '2.0.1',
     'author' => 'MyTax-Service'
 ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));

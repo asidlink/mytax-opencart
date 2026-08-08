@@ -32,7 +32,7 @@ $extId = $m->insert_id;
 echo "  [OK] oc_extension: id=$extId type=module code=mytax\n";
 
 // oc_extension_install
-$m->query("INSERT INTO {$p}extension_install SET `extension_id` = $extId, `extension_download_id` = 0, `code` = 'mytax', `name` = 'Мой налог: кассовые чеки для ИП (НПД)', `version` = '2.0.1', `author` = 'MyTax-Service', `link` = 'https://github.com/Ga1maz/fns-receipt-service', `status` = 1, `date_added` = NOW(), `date_modified` = NOW()");
+$m->query("INSERT INTO {$p}extension_install SET `extension_id` = $extId, `extension_download_id` = 0, `code` = 'mytax', `name` = 'Мой налог', `version` = '2.0.1', `author` = 'MyTax-Service', `link` = 'https://github.com/Ga1maz/fns-receipt-service', `status` = 1, `date_added` = NOW(), `date_modified` = NOW()");
 $instId = $m->insert_id;
 echo "  [OK] oc_extension_install: id=$instId\n";
 

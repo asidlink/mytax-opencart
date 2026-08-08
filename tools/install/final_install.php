@@ -14,7 +14,7 @@ if ($zip->open('C:/sites/metalka/mytax.ocmod.zip', ZipArchive::CREATE) !== true)
 
 $zip->addFromString('install.json', json_encode([
     'code' => 'mytax',
-    'name' => 'Мой налог: кассовые чеки для ИП (НПД)',
+    'name' => 'Мой налог',
     'version' => '2.0.1',
     'author' => 'MyTax-Service'
 ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
@@ -90,7 +90,7 @@ $extId = $m->insert_id;
 echo "  [OK] oc_extension id=$extId\n";
 
 // oc_extension_install
-$m->query("INSERT INTO {$p}extension_install SET extension_id=$extId, extension_download_id=0, code='mytax', name='Мой налог: кассовые чеки для ИП (НПД)', version='2.0.1', author='MyTax-Service', status=1, date_added=NOW()");
+$m->query("INSERT INTO {$p}extension_install SET extension_id=$extId, extension_download_id=0, code='mytax', name='Мой налог', version='2.0.1', author='MyTax-Service', status=1, date_added=NOW()");
 $instId = $m->insert_id;
 echo "  [OK] oc_extension_install id=$instId\n";
 

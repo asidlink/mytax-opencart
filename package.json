@@ -2,7 +2,7 @@
   "name": "mytax-service",
   "version": "1.0.0",
   "description": "Сервис чеков «Мой налог» для самозанятых и ИП на НПД — создание чеков через официальное API ФНС lknpd.nalog.ru",
-  "license": "MIT",
+  "license": "GPL-3.0",
   "author": "asidlink",
   "type": "module",
   "main": "server.js",

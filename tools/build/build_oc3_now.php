@@ -7,7 +7,7 @@ $zip = new ZipArchive();
 @unlink('C:/sites/metalka/mytax.ocmod.zip');
 if ($zip->open('C:/sites/metalka/mytax.ocmod.zip', ZipArchive::CREATE) !== true) die("FAIL");
 
-$zip->addFromString('install.json', '{"code":"mytax","name":"Мой налог: кассовые чеки для ИП (НПД)","version":"2.0.1","author":"MyTax-Service"}');
+$zip->addFromString('install.json', '{"code":"mytax","name":"Мой налог","version":"2.0.1","author":"MyTax-Service"}');
 
 // Admin OC3 path: upload/admin/controller/extension/module/mytax.php
 $zip->addFromString('upload/admin/controller/extension/module/mytax.php',

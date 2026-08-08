@@ -33,7 +33,7 @@ $files = [];
 
 $installJson = json_decode(file_get_contents("$ext/install.json"), true);
 $installJson['version'] = '4.0.8';
-$installJson['name'] = 'Мой налог: кассовые чеки для ИП (НПД)';
+$installJson['name'] = 'Мой налог';
 $files['install.json'] = json_encode($installJson, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 echo "  [OK] install.json (version=" . $installJson['version'] . ")\n";
 

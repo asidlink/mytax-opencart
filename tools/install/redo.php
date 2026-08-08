@@ -35,7 +35,7 @@ $paths = [
 foreach ($paths as $p2) $m->query("INSERT INTO {$p}extension_path SET extension_install_id=$instId, path='$p2'");
 echo "extension_path: ".count($paths)." записей\n";
 
-$m->query("INSERT INTO {$p}module SET name='Мой налог: кассовые чеки для ИП (НПД)', code='mytax', setting=''");
+$m->query("INSERT INTO {$p}module SET name='Мой налог', code='mytax', setting=''");
 echo "module id=" . $m->insert_id . "\n";
 
 $m->query("INSERT INTO {$p}event SET code='mytax_order_history', `trigger`='catalog/model/checkout/order.addHistory/before', action='extension/mytax/module/mytax.orderHistory', status=1, sort_order=1");

@@ -9,7 +9,7 @@ if ($zip->open($target, ZipArchive::CREATE) !== true) die("FAIL");
 // install.json с type=module
 $zip->addFromString('install.json', json_encode([
     'code' => 'mytax',
-    'name' => 'Мой налог: кассовые чеки для ИП (НПД)',
+    'name' => 'Мой налог',
     'version' => '2.4.0',
     'author' => 'MyTax-Service',
     'link' => '',
