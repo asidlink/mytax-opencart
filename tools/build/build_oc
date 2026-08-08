@@ -1,0 +1,184 @@
+<?php
+/**
+ * Сборка правильного mytax.ocmod.zip для OpenCart 3
+ * Пути: admin/controller/extension/module/ (OC3), а не admin/controller/module/ (OC4)
+ */
+$targetZip = 'C:/sites/metalka/mytax.ocmod.zip';
+
+@unlink($targetZip);
+
+$zip = new ZipArchive();
+if ($zip->open($targetZip, ZipArchive::CREATE) !== true) {
+    die("Не удалось создать архив\n");
+}
+
+$tempModule = 'C:/Users/admin/AppData/Local/Temp/mytax_zip_build';
+$tempPayment = 'C:/Users/admin/AppData/Local/Temp/zip_final';
+
+// ===== 1. install.json =====
+$zip->addFromString('install.json', json_encode([
+    'code' => 'mytax',
+    'name' => 'Мой налог: кассовые чеки для ИП (НПД)',
+    'description' => 'Автоматическое создание чеков в приложении Мой налог (НПД) при изменении статуса заказа',
+    'version' => '2.0.1',
+    'author' => 'MyTax-Service',
+    'link' => 'https://github.com/Ga1maz/fns-receipt-service'
+], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+echo "  + install.json\n";
+
+// ===== 2. Admin controller extension/module (OC3 path) =====
+$zip->addFromString(
+    'upload/admin/controller/extension/module/mytax.php',
+    file_get_contents("$tempModule/admin/controller/module/mytax.php")
+);
+echo "  + upload/admin/controller/extension/module/mytax.php (OC3 path)\n";
+
+// ===== 3. Admin language =====
+$zip->addFromString(
+    'upload/admin/language/ru-ru/extension/module/mytax.php',
+    file_get_contents("$tempModule/admin/language/ru-ru/module/mytax.php")
+);
+echo "  + upload/admin/language/ru-ru/extension/module/mytax.php\n";
+
+// ===== 4. Admin model =====
+$zip->addFromString(
+    'upload/admin/model/extension/module/mytax.php',
+    file_get_contents("$tempModule/admin/model/module/mytax.php")
+);
+echo "  + upload/admin/model/extension/module/mytax.php\n";
+
+// ===== 5. Admin view =====
+$zip->addFromString(
+    'upload/admin/view/template/extension/module/mytax.twig',
+    file_get_contents("$tempModule/admin/view/template/module/mytax.twig")
+);
+echo "  + upload/admin/view/template/extension/module/mytax.twig\n";
+
+// ===== 6. Catalog controller (payment) =====
+$zip->addFromString(
+    'upload/catalog/controller/extension/mytax/payment/mytax.php',
+    '<?php
+namespace Opencart\Catalog\Controller\Extension\Mytax\Payment;
+class Mytax extends \Opencart\System\Engine\Controller {
+    public function index(): void {
+        $this->response->setOutput("");
+    }
+    public function orderHistory(string &$route, array &$args): void {
+        $this->load->model("extension/mytax/checkout/mytax");
+        $order_id = $args[0];
+        $this->load->model("checkout/order");
+        $order_info = $this->model_checkout_order->getOrder($order_id);
+        if ($order_info) {
+            $this->model_extension_mytax_checkout_mytax->createReceipt($order_id, $order_info["email"]);
+        }
+    }
+    public function viewOrderHistory(string &$route, array &$args): void {
+        $this->load->model("extension/mytax/checkout/mytax");
+        $order_id = $args["order_id"] ?? 0;
+        if ($order_id) {
+            $receipt = $this->model_extension_mytax_checkout_mytax->getReceiptByOrderId($order_id);
+            if ($receipt) {
+                $args["mytax"] = $receipt;
+            }
+        }
+    }
+    public function viewOrderAdd(string &$route, array &$args): void {
+        $this->load->model("extension/mytax/checkout/mytax");
+        $order_id = $args["order_id"] ?? 0;
+        if ($order_id) {
+            $receipt = $this->model_extension_mytax_checkout_mytax->getReceiptByOrderId($order_id);
+            if ($receipt) {
+                $args["mytax"] = $receipt;
+            }
+        }
+    }
+}'
+);
+echo "  + upload/catalog/controller/extension/mytax/payment/mytax.php\n";
+
+// ===== 7. Catalog model (checkout) =====
+$zip->addFromString(
+    'upload/catalog/model/extension/mytax/checkout/mytax.php',
+    file_get_contents("$tempPayment/catalog/model/checkout/mytax.php")
+);
+echo "  + upload/catalog/model/extension/mytax/checkout/mytax.php\n";
+
+// ===== 8. Catalog payment language =====
+$zip->addFromString(
+    'upload/catalog/language/ru-ru/extension/mytax/payment/mytax.php',
+    file_get_contents("$tempPayment/catalog/language/ru-ru/payment/mytax.php")
+);
+echo "  + upload/catalog/language/ru-ru/extension/mytax/payment/mytax.php\n";
+
+// ===== 9. Catalog module language =====
+$zip->addFromString(
+    'upload/catalog/language/ru-ru/extension/mytax/module/mytax.php',
+    file_get_contents("$tempModule/catalog/language/ru-ru/module/mytax.php")
+);
+echo "  + upload/catalog/language/ru-ru/extension/mytax/module/mytax.php\n";
+
+// ===== 10. install.php (установщик) =====
+$zip->addFromString('install.php', '<?php
+function install() {
+    global $registry;
+    if (!$registry) return;
+    try {
+        $db = $registry->get("db");
+        if ($db) {
+            $db->query("CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "mytax_receipts` (
+                `receipt_id` int(11) NOT NULL AUTO_INCREMENT,
+                `order_id` int(11) NOT NULL,
+                `email` varchar(96) NOT NULL,
+                `fns_receipt_id` varchar(255) DEFAULT NULL,
+                `print_link` varchar(500) DEFAULT NULL,
+                `qr_code_path` varchar(255) DEFAULT NULL,
+                `amount` decimal(15,4) NOT NULL DEFAULT 0.0000,
+                `status` varchar(50) NOT NULL DEFAULT "pending",
+                `error_message` text DEFAULT NULL,
+                `date_added` datetime NOT NULL DEFAULT current_timestamp(),
+                PRIMARY KEY (`receipt_id`),
+                UNIQUE KEY `order_id` (`order_id`)
+            ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
+        }
+        $load = $registry->get("load");
+        if ($load) {
+            $load->model("setting/event");
+            $m = $registry->get("model_setting_event");
+            if ($m) {
+                $m->addEvent(["code" => "mytax_order_history", "description" => "Создание чека Мой Налог", "trigger" => "catalog/model/checkout/order.addHistory/before", "action" => "extension/mytax/payment/mytax.orderHistory", "status" => 1, "sort_order" => 1]);
+                $m->addEvent(["code" => "mytax_mail_order_history", "description" => "Данные чека в письме", "trigger" => "catalog/view/mail/order_history/before", "action" => "extension/mytax/payment/mytax.viewOrderHistory", "status" => 1, "sort_order" => 1]);
+                $m->addEvent(["code" => "mytax_mail_order_add", "description" => "Данные чека в письме", "trigger" => "catalog/view/mail/order_add/before", "action" => "extension/mytax/payment/mytax.viewOrderAdd", "status" => 1, "sort_order" => 1]);
+            }
+        }
+    } catch (Exception $e) {}
+}
+function uninstall() {
+    global $registry;
+    if (!$registry) return;
+    try {
+        $load = $registry->get("load");
+        if ($load) {
+            $load->model("setting/event");
+            $m = $registry->get("model_setting_event");
+            if ($m) {
+                $m->deleteEventByCode("mytax_order_history");
+                $m->deleteEventByCode("mytax_mail_order_history");
+                $m->deleteEventByCode("mytax_mail_order_add");
+            }
+        }
+    } catch (Exception $e) {}
+}');
+echo "  + install.php\n";
+
+$zip->close();
+
+echo "\nАрхив создан: $targetZip\n";
+echo "Содержимое:\n";
+$check = new ZipArchive();
+if ($check->open($targetZip) === true) {
+    for ($i = 0; $i < $check->numFiles; $i++) {
+        $s = $check->statIndex($i);
+        echo "  " . $check->getNameIndex($i) . " (" . $s['size'] . " bytes)\n";
+    }
+    $check->close();
+}
