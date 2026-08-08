@@ -1,0 +1,84 @@
+<?php
+$m = new mysqli('localhost', 'root', '', 'metalka');
+if ($m->connect_error) die("Connection failed\n");
+$p = 'oc_';
+
+echo "=== oc_extension WHERE code LIKE '%mytax%' ===\n";
+$r = $m->query("SELECT extension_id, type, code FROM {$p}extension WHERE code LIKE '%mytax%'");
+while ($row = $r->fetch_assoc()) {
+    echo "  id={$row['extension_id']} type={$row['type']} code={$row['code']}\n";
+}
+
+echo "\n=== oc_extension_install WHERE code LIKE '%mytax%' ===\n";
+$r = $m->query("SELECT extension_install_id, code FROM {$p}extension_install WHERE code LIKE '%mytax%'");
+while ($row = $r->fetch_assoc()) {
+    echo "  id={$row['extension_install_id']} code={$row['code']}\n";
+}
+
+echo "\n=== oc_extension_path WHERE path LIKE '%mytax%' ===\n";
+$r = $m->query("SELECT extension_path_id, path FROM {$p}extension_path WHERE path LIKE '%mytax%'");
+while ($row = $r->fetch_assoc()) {
+    echo "  id={$row['extension_path_id']} path={$row['path']}\n";
+}
+
+echo "\n=== oc_module WHERE code = 'mytax' ===\n";
+$r = $m->query("SELECT module_id, name, code FROM {$p}module WHERE code = 'mytax'");
+while ($row = $r->fetch_assoc()) {
+    echo "  id={$row['module_id']} name={$row['name']} code={$row['code']}\n";
+}
+
+echo "\n=== oc_event WHERE code LIKE 'mytax%' (using backtick) ===\n";
+$r = $m->query("SELECT event_id, code, `trigger`, `action` FROM {$p}event WHERE code LIKE 'mytax%'");
+while ($row = $r->fetch_assoc()) {
+    echo "  id={$row['event_id']} code={$row['code']} trigger={$row['trigger']} action={$row['action']}\n";
+}
+
+echo "\n=== oc_setting WHERE code LIKE '%mytax%' ===\n";
+$r = $m->query("SELECT setting_id, code, `key`, `value` FROM {$p}setting WHERE code LIKE '%mytax%'");
+while ($row = $r->fetch_assoc()) {
+    $val = substr($row['value'], 0, 80);
+    echo "  id={$row['setting_id']} code={$row['code']} key={$row['key']} value={$val}\n";
+}
+
+echo "\n=== oc_setting WHERE `key` LIKE '%mytax%' ===\n";
+$r = $m->query("SELECT setting_id, code, `key` FROM {$p}setting WHERE `key` LIKE '%mytax%'");
+while ($row = $r->fetch_assoc()) {
+    echo "  id={$row['setting_id']} code={$row['code']} key={$row['key']}\n";
+}
+
+echo "\n=== oc_layout_module WHERE code = 'mytax' ===\n";
+$r = $m->query("SELECT layout_module_id, layout_id, code, position FROM {$p}layout_module WHERE code = 'mytax'");
+while ($row = $r->fetch_assoc()) {
+    echo "  id={$row['layout_module_id']} layout_id={$row['layout_id']} code={$row['code']} position={$row['position']}\n";
+}
+
+echo "\n=== oc_modification WHERE code LIKE '%mytax%' ===\n";
+$r = $m->query("SELECT modification_id, name, code FROM {$p}modification WHERE code LIKE '%mytax%'");
+while ($row = $r->fetch_assoc()) {
+    echo "  id={$row['modification_id']} name={$row['name']} code={$row['code']}\n";
+}
+
+echo "\n=== EXTENSION module files on disk ===\n";
+$checkDirs = [
+    'C:/sites/metalka/extension/mytax',
+    'C:/sites/metalka/admin/controller/extension/module/',
+    'C:/sites/metalka/admin/language/ru-ru/extension/module/',
+    'C:/sites/metalka/admin/model/extension/module/',
+    'C:/sites/metalka/admin/view/template/extension/module/',
+    'C:/sites/metalka/catalog/controller/extension/module/',
+    'C:/sites/metalka/catalog/language/ru-ru/extension/module/',
+    'C:/sites/metalka/catalog/model/extension/module/',
+    'C:/sites/metalka/catalog/view/template/extension/module/',
+];
+foreach ($checkDirs as $dir) {
+    if (is_dir($dir)) {
+        $files = scandir($dir);
+        foreach ($files as $f) {
+            if ($f != '.' && $f != '..' && stripos($f, 'mytax') !== false) {
+                echo "  [FILE] $dir$f\n";
+            }
+        }
+    }
+}
+
+$m->close();

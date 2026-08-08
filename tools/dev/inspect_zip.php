@@ -1,0 +1,36 @@
+<?php
+$zipPath = 'G:/DOWNLOAD/mytax.ocmod.zip';
+
+if (!file_exists($zipPath)) {
+    echo "Файл не найден: $zipPath\n";
+    foreach (glob('G:/DOWNLOAD/*.zip') as $f) {
+        echo "Найден: $f\n";
+    }
+    exit;
+}
+
+echo "=== Анализ рабочего архива от ChatGPT ===\n\n";
+$z = new ZipArchive();
+if ($z->open($zipPath) !== true) {
+    die("Не удалось открыть архив\n");
+}
+
+echo "Всего файлов: {$z->numFiles}\n\n";
+echo "Содержимое:\n";
+for ($i = 0; $i < $z->numFiles; $i++) {
+    $name = $z->getNameIndex($i);
+    $stat = $z->statIndex($i);
+    $size = $stat['size'];
+    echo "  [{$size} bytes] {$name}\n";
+}
+
+echo "\n=== install.json ===\n";
+$json = $z->getFromName('install.json');
+echo $json ? $json : "(нет)";
+
+echo "\n\n=== install.php ===\n";
+$install = $z->getFromName('install.php');
+echo $install ? $install : "(нет)";
+
+echo "\n";
+$z->close();

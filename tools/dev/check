@@ -1,0 +1,30 @@
+<?php
+$m = new mysqli('localhost', 'root', '', 'metalka');
+$p = 'oc_';
+
+echo "=== structure of oc_extension ===\n";
+$r = $m->query("SHOW CREATE TABLE {$p}extension");
+$row = $r->fetch_assoc();
+echo $row['Create Table'] . "\n\n";
+
+echo "=== structure of oc_extension_install ===\n";
+$r = $m->query("SHOW CREATE TABLE {$p}extension_install");
+$row = $r->fetch_assoc();
+echo $row['Create Table'] . "\n\n";
+
+echo "=== structure of oc_extension_path ===\n";
+$r = $m->query("SHOW CREATE TABLE {$p}extension_path");
+$row = $r->fetch_assoc();
+echo $row['Create Table'] . "\n\n";
+
+echo "=== structure of oc_module ===\n";
+$r = $m->query("SHOW CREATE TABLE {$p}module");
+$row = $r->fetch_assoc();
+echo $row['Create Table'] . "\n\n";
+
+echo "=== structure of oc_event ===\n";
+$r = $m->query("SHOW CREATE TABLE {$p}event");
+$row = $r->fetch_assoc();
+echo $row['Create Table'] . "\n\n";
+
+$m->close();
