@@ -1,7 +1,7 @@
 {
     "code": "mytax",
-    "name": "Мой налог",
-    "version": "4.0.8",
+    "name": "Мой налог: кассовые чеки для ИП (НПД)",
+    "version": "4.0.9",
     "author": "MyTax-Service",
     "link": "",
     "type": "module"

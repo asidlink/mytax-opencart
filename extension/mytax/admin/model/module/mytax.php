@@ -8,6 +8,7 @@ class Mytax extends \Opencart\System\Engine\Model {
             `receipt_id` int(11) NOT NULL AUTO_INCREMENT,
             `order_id` int(11) NOT NULL,
             `email` varchar(96) NOT NULL,
+            `ip` varchar(40) NOT NULL DEFAULT '',
             `fns_receipt_id` varchar(255) DEFAULT NULL,
             `print_link` varchar(500) DEFAULT NULL,
             `qr_code_path` varchar(255) DEFAULT NULL,
@@ -19,18 +20,28 @@ class Mytax extends \Opencart\System\Engine\Model {
             UNIQUE KEY `order_id` (`order_id`)
         ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
 
+        // Колонка ip (счётчик лимита на один IP) — если таблица уже была создана
+        // без неё на старых версиях модуля.
+        $columns = $this->db->query("SHOW COLUMNS FROM `" . DB_PREFIX . "mytax_receipts` LIKE 'ip'");
+        if (!$columns->num_rows) {
+            $this->db->query("ALTER TABLE `" . DB_PREFIX . "mytax_receipts` ADD COLUMN `ip` varchar(40) NOT NULL DEFAULT '' AFTER `email`");
+        }
+
         $this->load->model('setting/event');
         // Очистка старых событий
         foreach (['mytax_order_history','mytax_mail_order_history','mytax_mail_order_add','mytax_checkout_success','mytax_mail_order_add_after','mytax_mail_order_history_after'] as $code) {
             $this->model_setting_event->deleteEventByCode($code);
         }
-        // Создание чека при смене статуса заказа
+        // Создание чека при смене статуса заказа.
+        // sort_order = 0 — событие выполняется ДО mail/order (sort_order = 1),
+        // чтобы чек «Мой налог» (и его QR-код) был создан до рендера письма
+        // покупателю об изменении статуса. Иначе QR-блок не попадает в письмо.
         $this->model_setting_event->addEvent([
             'code' => 'mytax_order_history',
             'description' => 'Создание чека «Мой налог» при изменении статуса заказа',
             'trigger' => 'catalog/model/checkout/order.addHistory/before',
             'action' => 'extension/mytax/module/mytax.orderHistory',
-            'status' => 1, 'sort_order' => 1
+            'status' => 1, 'sort_order' => 0
         ]);
         // Дополнение письма о новом заказе данными чека
         $this->model_setting_event->addEvent([

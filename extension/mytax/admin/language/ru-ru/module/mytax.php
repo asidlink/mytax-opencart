@@ -1,5 +1,5 @@
 <?php
-$_['heading_title'] = 'Мой налог';
+$_['heading_title'] = 'Мой налог: кассовые чеки для ИП (НПД)';
 $_['text_edit'] = 'Редактирование модуля';
 $_['text_enabled'] = 'Включено';
 $_['text_disabled'] = 'Отключено';
@@ -7,6 +7,18 @@ $_['entry_status'] = 'Статус';
 $_['entry_inn'] = 'ИНН';
 $_['entry_password'] = 'Пароль (личный кабинет Мой налог)';
 $_['entry_app_name'] = 'Название приложения';
+$_['entry_limit_global'] = 'Глобальный лимит (чеков/час)';
+$_['entry_limit_ip'] = 'Лимит на один IP (чеков/час)';
+$_['entry_test_connection'] = 'Проверка соединения';
+$_['button_test_connection'] = '🔌 Проверить соединение с «Мой налог»';
+$_['text_test_checking'] = 'Проверка…';
+$_['text_test_ok'] = 'Соединение установлено: вход в «Мой налог» успешен';
+$_['text_test_fail'] = 'Ошибка соединения';
+$_['text_test_inn'] = 'ИНН';
+$_['text_test_unknown'] = 'неизвестный ответ API ФНС';
+$_['text_test_no_answer'] = 'Нет ответа от сервера';
+$_['text_test_ajax_error'] = 'Ошибка AJAX-запроса';
+$_['error_test_empty'] = 'Укажите ИНН и пароль';
 $_['button_save'] = 'Сохранить';
 $_['button_cancel'] = 'Отмена';
 $_['text_success'] = 'Настройки сохранены';

@@ -62,15 +62,8 @@ class Mytax extends \Opencart\System\Engine\Controller {
     public function viewOrderAdd(string &$route, array &$args): void {
         $id = $this->getOrderId($args);
         if (!$id) return;
-        // Гарантируем создание чека перед рендером письма.
-        // Письмо отправляется только при положительном статусе (логика mail/order),
-        // но БД ещё не обновлена (addHistory обновляет статус ПОСЛЕ before-событий).
-        $this->load->model('extension/mytax/checkout/mytax');
-        $this->load->model('checkout/order');
-        $o = $this->model_checkout_order->getOrder($id);
-        if ($o) {
-            $this->model_extension_mytax_checkout_mytax->createReceipt($id, $o['email'], null, true);
-        }
+        // Чек формируется отдельным событием (addHistory) — только когда заказ
+        // переходит в статус «Оплачен». Здесь лишь подставляем уже созданный чек в письмо.
         $r = $this->getReceiptData($id);
         if ($r) $args['mytax_receipt'] = $r;
     }
@@ -79,12 +72,8 @@ class Mytax extends \Opencart\System\Engine\Controller {
     public function viewOrderHistory(string &$route, array &$args): void {
         $id = $this->getOrderId($args);
         if (!$id) return;
-        $this->load->model('extension/mytax/checkout/mytax');
-        $this->load->model('checkout/order');
-        $o = $this->model_checkout_order->getOrder($id);
-        if ($o) {
-            $this->model_extension_mytax_checkout_mytax->createReceipt($id, $o['email'], null, true);
-        }
+        // Чек формируется отдельным событием (addHistory) — только когда заказ
+        // переходит в статус «Оплачен». Здесь лишь подставляем уже созданный чек в письмо.
         $r = $this->getReceiptData($id);
         if ($r) $args['mytax_receipt'] = $r;
     }

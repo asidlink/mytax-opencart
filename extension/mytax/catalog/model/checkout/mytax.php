@@ -4,6 +4,9 @@ namespace Opencart\Catalog\Model\Extension\Mytax\Checkout;
 class Mytax extends \Opencart\System\Engine\Model {
     const API_URL = 'https://lknpd.nalog.ru/api/v1';
     const LOG = 'mytax.log';
+    // Кассовый чек в «Мой налог» формируется ТОЛЬКО один раз — когда заказ
+    // переходит в статус «Оплачен» (order_status_id = 17).
+    const PAID_STATUS_ID = 17;
 
     private function log(string $msg): void {
         if (defined('DIR_STORAGE')) {
@@ -23,6 +26,7 @@ class Mytax extends \Opencart\System\Engine\Model {
         $this->db->query("INSERT INTO `" . DB_PREFIX . "mytax_receipts` SET
             `order_id`='" . (int)$order_id . "',
             `email`='" . $this->db->escape($email) . "',
+            `ip`='" . $this->db->escape($d['ip'] ?? '') . "',
             `fns_receipt_id`='" . $this->db->escape($d['receiptId'] ?? '') . "',
             `print_link`='" . $this->db->escape($d['printLink'] ?? '') . "',
             `qr_code_path`='" . $this->db->escape($d['qrCodePath'] ?? '') . "',
@@ -45,6 +49,7 @@ class Mytax extends \Opencart\System\Engine\Model {
         $this->db->query("INSERT INTO `" . DB_PREFIX . "mytax_receipts` SET
             `order_id`='" . (int)$order_id . "',
             `email`='" . $this->db->escape($email) . "',
+            `ip`='" . $this->db->escape($this->getClientIp()) . "',
             `status`='error',
             `error_message`='" . $this->db->escape($msg) . "',
             `date_added`=NOW()
@@ -76,24 +81,44 @@ class Mytax extends \Opencart\System\Engine\Model {
             $this->log("Заказ не найден: order=$order_id");
             return ['success' => false, 'error' => 'Заказ не найден'];
         }
-        // Если письмо рендерится (viewOrderAdd/viewOrderHistory) — статус уже положительный,
-        // даже если БД ещё не обновлена (addHistory обновляет статус ПОСЛЕ before-событий).
-        if ($force) {
-            $this->log("Чек создаётся принудительно (рендер письма): order=$order_id");
-        } else {
-            // Статус из аргументов события (актуален ДО обновления БД в addHistory),
-            // иначе берём текущий статус заказа.
-            $effective_status = $order_status_id ?? (int)$o['order_status_id'];
-            if ($effective_status <= 0) {
-                $this->log("Заказ не оплачен или не найден: order=$order_id status=" . $effective_status);
-                return ['success' => false, 'error' => 'Заказ не оплачен'];
-            }
+
+        // Чек формируется ТОЛЬКО один раз, когда заказ переходит в статус «Оплачен» (17).
+        // Статус из аргументов события (актуален ДО обновления БД в addHistory),
+        // иначе берём текущий статус заказа.
+        $effective_status = $order_status_id ?? (int)$o['order_status_id'];
+
+        if ((int)$effective_status !== self::PAID_STATUS_ID) {
+            $this->log("Чек не формируется: order=$order_id status=$effective_status (ожидается " . self::PAID_STATUS_ID . ")");
+            return ['success' => false, 'error' => 'Заказ не оплачен'];
         }
 
         $this->load->model('setting/setting');
         $s = $this->model_setting_setting->getSetting('module_mytax');
         $inn = $s['module_mytax_inn'] ?? '';
         $pass = $s['module_mytax_password'] ?? '';
+
+        // Лимиты создания кассовых чеков «Мой налог» (в час)
+        $global_limit = (int)($s['module_mytax_limit_global'] ?? 10);
+        $ip_limit = (int)($s['module_mytax_limit_ip'] ?? 3);
+
+        if ($global_limit > 0) {
+            $q = $this->db->query("SELECT COUNT(*) AS c FROM `" . DB_PREFIX . "mytax_receipts` WHERE `status`='completed' AND `date_added` > (NOW() - INTERVAL 1 HOUR)");
+            if ((int)$q->row['c'] >= $global_limit) {
+                $this->log("Лимит чеков превышен (глобальный): order=$order_id count=" . (int)$q->row['c'] . " limit=$global_limit");
+                return ['success' => false, 'error' => 'Превышен глобальный лимит создания чеков'];
+            }
+        }
+
+        $ip = $this->getClientIp();
+
+        if ($ip_limit > 0 && $ip) {
+            $q = $this->db->query("SELECT COUNT(*) AS c FROM `" . DB_PREFIX . "mytax_receipts` WHERE `status`='completed' AND `ip`='" . $this->db->escape($ip) . "' AND `date_added` > (NOW() - INTERVAL 1 HOUR)");
+            if ((int)$q->row['c'] >= $ip_limit) {
+                $this->log("Лимит чеков превышен (по IP): order=$order_id ip=$ip count=" . (int)$q->row['c'] . " limit=$ip_limit");
+                return ['success' => false, 'error' => 'Превышен лимит создания чеков для вашего IP'];
+            }
+        }
+
         if (!$inn || !$pass) {
             $this->log("Нет ИНН/пароля: order=$order_id");
             return ['success' => false, 'error' => 'Нет ИНН/пароля в настройках'];
@@ -131,7 +156,7 @@ class Mytax extends \Opencart\System\Engine\Model {
                 $token = $auth['token'];
                 if (!empty($auth['profile']['inn'])) $inn = $auth['profile']['inn'];
 
-                $now = new \DateTime('now', new \DateTimeZone('UTC'));
+                $now = new \DateTime('now', new \DateTimeZone('Europe/Moscow'));
                 $payload = [
                     'paymentType' => 'CASH',
                     'ignoreMaxTotalIncomeRestriction' => false,
@@ -141,8 +166,8 @@ class Mytax extends \Opencart\System\Engine\Model {
                         'incomeType' => 'FROM_INDIVIDUAL',
                         'inn' => null
                     ],
-                    'requestTime' => $now->format('Y-m-d\TH:i:s.u\Z'),
-                    'operationTime' => $now->format('Y-m-d\TH:i:s.u\Z'),
+                    'requestTime' => $now->format('Y-m-d\TH:i:s.uP'),
+                    'operationTime' => $now->format('Y-m-d\TH:i:s.uP'),
                     'services' => $services,
                     'totalAmount' => $total
                 ];
@@ -151,7 +176,7 @@ class Mytax extends \Opencart\System\Engine\Model {
                 $uuid = $res['approvedReceiptUuid'];
                 $link = 'https://lknpd.nalog.ru/api/v1/receipt/' . $inn . '/' . $uuid . '/print';
                 $qr = $this->generateQRCode($link, $order_id);
-                $data = ['receiptId' => $uuid, 'printLink' => $link, 'qrCodePath' => $qr, 'amount' => $total];
+                $data = ['receiptId' => $uuid, 'printLink' => $link, 'qrCodePath' => $qr, 'amount' => $total, 'ip' => $ip];
                 $this->saveReceipt($order_id, $email, $data);
                 return ['success' => true] + $data;
             } catch (\Exception $e) {
@@ -183,7 +208,9 @@ class Mytax extends \Opencart\System\Engine\Model {
         ]);
         $r = curl_exec($ch);
         $err = curl_error($ch);
-        curl_close($ch);
+        if (is_resource($ch) || $ch instanceof \CurlHandle) {
+            curl_close($ch);
+        }
         if ($r === false) throw new \Exception('cURL: ' . $err);
         $d = json_decode((string)$r, true);
         if (!is_array($d)) throw new \Exception('Не удалось распарсить ответ ФНС');
@@ -225,6 +252,25 @@ class Mytax extends \Opencart\System\Engine\Model {
             }
         }
         $this->log("Библиотека QR не найдена");
+        return '';
+    }
+
+    /**
+     * IP клиента (с учётом Cloudflare / прокси).
+     *
+     * @return string
+     */
+    private function getClientIp(): string {
+        foreach (['HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR'] as $key) {
+            if (!empty($_SERVER[$key])) {
+                $ip = trim(explode(',', (string)$_SERVER[$key])[0]);
+
+                if ($ip !== '') {
+                    return $ip;
+                }
+            }
+        }
+
         return '';
     }
 }

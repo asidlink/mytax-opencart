@@ -38,9 +38,59 @@
             <label class="col-sm-2 col-form-label">{{ entry_app_name }}</label>
             <div class="col-sm-10"><input type="text" name="module_mytax_app_name" value="{{ module_mytax_app_name }}" class="form-control" /></div>
           </div>
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label">{{ entry_limit_global }}</label>
+            <div class="col-sm-10"><input type="number" min="0" name="module_mytax_limit_global" value="{{ module_mytax_limit_global ? module_mytax_limit_global : 10 }}" class="form-control" /></div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label">{{ entry_limit_ip }}</label>
+            <div class="col-sm-10"><input type="number" min="0" name="module_mytax_limit_ip" value="{{ module_mytax_limit_ip ? module_mytax_limit_ip : 3 }}" class="form-control" /></div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label">{{ entry_test_connection }}</label>
+            <div class="col-sm-10">
+              <button type="button" id="button-mytax-test" class="btn btn-info"><i class="fa-solid fa-plug"></i> {{ button_test_connection }}</button>
+              <div id="mytax-test-result" class="mt-2 small"></div>
+            </div>
+          </div>
         </form>
       </div>
     </div>
   </div>
 </div>
 {{ footer }}
+<script>
+$('#button-mytax-test').on('click', function (e) {
+    e.preventDefault();
+    var btn = $(this);
+    var box = $('#mytax-test-result');
+
+    btn.prop('disabled', true);
+    box.removeClass('text-success text-danger').addClass('text-secondary').html('{{ text_test_checking }}');
+
+    $.ajax({
+        url: '{{ test_connection }}',
+        type: 'post',
+        dataType: 'json',
+        data: {
+            module_mytax_inn: $('input[name="module_mytax_inn"]').val(),
+            module_mytax_password: $('input[name="module_mytax_password"]').val()
+        },
+        success: function (json) {
+            btn.prop('disabled', false);
+
+            if (json['success']) {
+                box.removeClass('text-secondary text-danger').addClass('text-success').html('<i class="fa-solid fa-circle-check"></i> ' + json['success']);
+            } else if (json['error']) {
+                box.removeClass('text-secondary text-success').addClass('text-danger').html('<i class="fa-solid fa-circle-xmark"></i> ' + json['error']);
+            } else {
+                box.removeClass('text-success text-danger').addClass('text-secondary').html('{{ text_test_no_answer }}');
+            }
+        },
+        error: function () {
+            btn.prop('disabled', false);
+            box.removeClass('text-secondary text-success').addClass('text-danger').html('{{ text_test_ajax_error }}');
+        }
+    });
+});
+</script>
