@@ -1,6 +1,6 @@
 # 🧾 Мой налог. Модуль OpenCart 4
 
-![OpenCart](https://img.shields.io/badge/OpenCart-4.x-008080) ![PHP](https://img.shields.io/badge/PHP-8.0%2B-777BB4) ![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933) ![Версия](https://img.shields.io/badge/версия-4.0.8-blue) ![Лицензия](https://img.shields.io/badge/лицензия-GPL--3.0-red)
+![OpenCart](https://img.shields.io/badge/OpenCart-4.x-008080) ![PHP](https://img.shields.io/badge/PHP-8.0%2B-777BB4) ![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933) ![Версия](https://img.shields.io/badge/версия-4.0.9-blue) ![Лицензия](https://img.shields.io/badge/лицензия-GPL--3.0-red)
 
 > Автоматическое создание чеков в «Мой Налог» (через API). Отправка письма покупателю с QR-кодом кассового чека после оплаты.
 
@@ -70,7 +70,7 @@
 
 | Часть | Назначение |
 |-------|------------|
-| `extension/mytax/` | **PHP-модуль OpenCart 4** (текущая версия 4.0.8) |
+| `extension/mytax/` | **PHP-модуль OpenCart 4** (текущая версия 4.0.9) |
 | `config/`, `routes/`, `services/`, `utils/`, `server.js`, `mytax-cli.js` | **Node.js-сервис** (историческая версия v1.x) |
 | `phpqrcode/` | Библиотека генерации QR-кодов (PHP QR Code, LGPL-3) |
 | `install_mytax_debian.php` | Автономный установщик для Debian/Linux |
@@ -83,14 +83,14 @@ mytax-opencart/
 │   ├── admin/                 #   контроллер, модель, язык, шаблон настроек
 │   ├── catalog/               #   контроллер событий, модель API ФНС, phpqrcode
 │   ├── ocmod/                 #   фикс зависания «Обновить файлы поставщиков»
-│   ├── install.json           #   метаданные модуля (версия 4.0.8)
+│   ├── install.json           #   метаданные модуля (версия 4.0.9)
 │   └── install.php
 ├── config/                    # Node.js: конфигурация (из .env)
 ├── routes/                    # Node.js: маршруты /health, /api/v1/create-receipt
 ├── services/                  # Node.js: работа с API ФНС (lknpd-nalog-api)
 ├── utils/                     # Node.js: помощники ответов
 ├── phpqrcode/                 # PHP QR Code — библиотека генерации QR (исходники)
-├── releases/                  # Готовый дистрибутив mytax.ocmod.zip (v4.0.8)
+├── releases/                  # Готовый дистрибутив mytax.ocmod.zip (v4.0.9)
 ├── tools/
 │   ├── build/                 # Сборка mytax.ocmod.zip (build_v4 … build_v9)
 │   ├── install/               # Установщики, переустановка, деплой
@@ -318,6 +318,7 @@ extension/mytax/
 
 | Версия | Дата | Описание |
 |--------|------|----------|
+| **4.0.9** | 30.08.2026 | ✨ Кнопка проверки соединения с «Мой налог», QR-код в письме об оплате, корректное сохранение паролей со спецсимволами, скрипт автоповтора чеков |
 | **4.0.8** | 07.08.2026 | ✅ QR-код чека ФНС в письмах покупателю (встроенная библиотека phpqrcode, after-события) |
 | 4.0.7 | 06.08.2026 | Фикс создания чека: статус из аргументов события, force в view-методах |
 | 4.0.6 | 05.08.2026 | Исправления событий и писем |
@@ -328,7 +329,7 @@ extension/mytax/
 | 4.0.1 | 31.07.2026 | Полная PHP-переработка модуля |
 | 1.x | 2025 | Node.js-сервис чеков (предшественник) |
 
-В репозитории история версий продублирована **git-тегами**: `v1.0.0-nodejs` (Node.js-сервис) и `v4.0.8` (текущий релиз модуля).
+В репозитории история версий продублирована **git-тегами**: `v1.0.0-nodejs` (Node.js-сервис) и `v4.0.9` (текущий релиз модуля).
 
 ---
 

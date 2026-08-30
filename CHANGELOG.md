@@ -24,6 +24,16 @@
 
 - `scripts/mytax_retry.php` — по cron повторяет создание чеков для оплаченных заказов, у которых чек не удалось создать (статус `error`/`pending`). Защита от блокировки ЛК «Мой налог»: при полном провале пауза 60 минут, не более 3 чеков за запуск.
 
+**Файлы изменены:**
+- `admin/controller/module/mytax.php` — кнопка «Проверить соединение» (`testConnection`, `fnsAuth`), декодирование HTML-сущностей в `save()`.
+- `admin/view/template/module/mytax.twig` — кнопка и JS проверки соединения.
+- `admin/language/ru-ru/module/mytax.php` — новые строки.
+- `admin/model/module/mytax.php` — событие `mytax_order_history` на `sort_order = 0`, колонка `ip`.
+- `catalog/model/checkout/mytax.php` — лимиты (глобальный и по IP), IP клиента, фикс `curl_close()` (PHP 8.5).
+- `catalog/controller/module/mytax.php` — актуализирован под новую модель.
+- `scripts/mytax_retry.php` — **добавлен** скрипт автоповтора чеков.
+- `install.json`, `README.txt` — версия 4.0.9.
+
 ---
 
 ## [4.0.8] — 07.08.2026
