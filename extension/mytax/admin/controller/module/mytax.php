@@ -19,7 +19,11 @@ class Mytax extends \Opencart\System\Engine\Controller {
         $data['button_cancel'] = $this->language->get('button_cancel');
         $data['save'] = $this->url->link('extension/mytax/module/mytax.save', 'user_token=' . $this->session->data['user_token']);
         $data['back'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module');
-        $data['test_connection'] = $this->url->link('extension/mytax/module/mytax.testConnection', 'user_token=' . $this->session->data['user_token']);
+        // Третий аргумент $js = true: Url::link() НЕ заменяет «&» на «&amp;».
+        // Без этого в JS (url: '{{ test_connection }}') запрос уходит с литеральным
+        // «&amp;user_token=...», сервер не видит токен, редиректит на логин,
+        // и jQuery показывает «Ошибка AJAX-запроса».
+        $data['test_connection'] = $this->url->link('extension/mytax/module/mytax.testConnection', 'user_token=' . $this->session->data['user_token'], true);
 
         $this->load->model('setting/setting');
         $settings = $this->model_setting_setting->getSetting('module_mytax');

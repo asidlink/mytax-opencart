@@ -2,6 +2,18 @@
 namespace Opencart\Admin\Model\Extension\Mytax\Module;
 
 class Mytax extends \Opencart\System\Engine\Model {
+    /**
+     * Данные чека «Мой налог» по заказу (для страницы заказа в админке).
+     *
+     * @param int $order_id
+     *
+     * @return array
+     */
+    public function getReceiptByOrderId(int $order_id): array {
+        $q = $this->db->query("SELECT * FROM `" . DB_PREFIX . "mytax_receipts` WHERE `order_id` = '" . (int)$order_id . "' LIMIT 1");
+        return $q->num_rows ? $q->row : [];
+    }
+
     public function install(): void {
         // Таблица чеков
         $this->db->query("CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "mytax_receipts` (
